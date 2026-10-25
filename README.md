@@ -34,6 +34,16 @@ distance(parcel, area);
 | Overture `division_area` part-00000 | 約 767MB | 253,517 B（約 0.03%） |
 | Overture `places` part-00015（日本を含む） | 約 733MB | 約 1.6MB（row group 256） |
 
+`example/src/remote.ts` では、GitHub に置いた facilities.parquet（106KB）を読み、送った Range リクエストを表示します。
+
+```
+## フッタ: 1000 行、row group 10
+  bytes=106158-106165  → 206 8 B        末尾 8 バイト（フッタの長さと "PAR1"）
+  bytes=81667-106157   → 206 24491 B    フッタ
+## row group 0 の name / visitors: 100 件
+  bytes=766-2427       → 206 1662 B     row group 0 の 2 列だけ
+```
+
 `example/src/overture.ts` では、places（733MB）から札幌市中心部の bbox × `confidence >= 0.8` の 7,947 件を、フッタ 1.6MB + データ 3.1MB の取得で読んでいます。
 
 ## 動かし方
@@ -48,6 +58,7 @@ cd example
 node src/typed-read.ts                      # 絞り込むたびに型が狭まる様子（手元のファイル）
 node src/sapporo-facilities.ts              # 実務を想定したサンプル
 node src/read-parcels.ts                    # hyparquet で読んだ値とメタデータの確認
+node src/remote.ts                          # GitHub 上の facilities.parquet を Range で読む（通信あり）
 node src/overture.ts                        # Overture の実データ（通信あり）
 ```
 
@@ -71,12 +82,14 @@ example/
   data/
     facilities.parquet         札幌市の架空の施設 1,000 件（10 区 × 100 件、row group = 1 区）
     parcels.parquet            架空の区画 2 件（Polygon, EPSG:6680）
+    facilities.parquet.ref     GitHub 上の facilities.parquet（コミットハッシュ付きの URL）
     places.parquet.ref         Overture 2026-10-21.0 places part-00015
     division_area.parquet.ref  Overture 2026-10-21.0 division_area part-00000
   scripts/make-facilities.*    facilities.parquet の作成（DuckDB → ogr2ogr で row group を 100 行に）
   src/
     typed-read.ts              typed-hyparquet: 列・条件・row group で型が狭まる様子
     sapporo-facilities.ts      typed-hyparquet: 実務を想定したサンプル
+    remote.ts                  Range リクエストの様子（フッタ → 必要な column chunk だけ）
     overture.ts                typed-hyparquet: Overture の実データと取得量の計測
     schema-types.ts            Row 型の使い方（入れ子、null、ジオメトリの union、CRS）
     geoparquet.ts              手元とリモートのファイル、CRS 不一致
