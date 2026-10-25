@@ -1,0 +1,14 @@
+{
+  "name": "typed-hyparquet",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Type-safe wrapper of hyparquet: the result type follows the columns, filter, row groups you read (types come from geoparquet-content-mapper)",
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "hyparquet": "1.31.5"
+  }
+}

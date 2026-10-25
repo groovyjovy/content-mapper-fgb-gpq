@@ -1,0 +1,17 @@
+{
+  "name": "example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --runExternalCode"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "geo-crs-types": "workspace:*",
+    "geoparquet-content-mapper": "workspace:*",
+    "hyparquet": "1.31.5",
+    "hyparquet-compressors": "1.1.2",
+    "typed-hyparquet": "workspace:*",
+    "typescript": "7.1.0-beta"
+  }
+}

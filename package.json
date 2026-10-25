@@ -1,0 +1,16 @@
+{
+  "name": "geoparquet-content-mapper-workspace",
+  "private": true,
+  "type": "module",
+  "description": "Type GeoParquet files from their footer with TypeScript 7 content mappers (local or remote)",
+  "engines": {
+    "node": ">=24.10"
+  },
+  "scripts": {
+    "typecheck": "pnpm --filter example typecheck"
+  },
+  "devDependencies": {
+    "typescript": "7.1.0-beta"
+  },
+  "packageManager": "pnpm@10.17.1"
+}
