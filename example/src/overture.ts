@@ -69,37 +69,6 @@ for (const p of sapporo.slice(0, 5)) {
   console.log(`  ${p.names?.primary} (${p.basic_category}) [${lon?.toFixed(4)}, ${lat?.toFixed(4)}] confidence=${p.confidence?.toFixed(2)}`);
 }
 
-// --- 入れ子の列で絞る: カテゴリが cafe ----------------------------------------------
-
-t = performance.now();
-const cafes = await read(file, {
-  bbox: [141.33, 43.05, 141.37, 43.07],
-  filter: { $and: [{ basic_category: "cafe" }, { confidence: { $gte: 0.9 } }] },
-  columns: ["names", "basic_category", "confidence"],
-  compressors,
-  metadata,
-});
-type _5 = Assert<Equal<Item<typeof cafes>["basic_category"], "cafe">>;
-console.log(`\n## 札幌市中心部 × cafe × confidence >= 0.9: ${cafes.length} 件`);
-console.log("  ", cafes.slice(0, 10).map((c) => c.names?.primary).join(" / "));
-report("bbox + $and", t);
-
-// --- division_area（part-00000、南北アメリカ）: row group の統計で型が狭まる --------------------
-// mapper の RowGroups を見ると、row group 3 は country が全部 "MX"（RowGroup1）。
-
-import type { Row as Division, RowCounts as DivisionCounts, RowGroups as DivisionGroups } from "../data/division_area.parquet.ref";
-const divisionUrl = (JSON.parse(readFileSync(new URL("../data/division_area.parquet.ref", import.meta.url), "utf8")) as { url: string }).url;
-const divisionFile = cachedAsyncBuffer(await asyncBufferFromUrl({ url: divisionUrl, fetch: countingFetch }));
-const readDivisions = readParquet<Division, DivisionGroups, DivisionCounts>();
-
-t = performance.now();
-const mx = await readDivisions(divisionFile, { rowGroups: [3], columns: ["country", "subtype", "names"], compressors });
-type _6 = Assert<Equal<Item<typeof mx>["country"], "MX">>;
-type _7 = Assert<Equal<typeof mx.length, 2512>>; // row group 3 の行数（フッタから）
-
 // 何も絞らなければファイル全体の行数。256 個の row group の行数を型の上で足している
 type AllPlaces = Awaited<ReturnType<typeof read<{}>>>;
-type _8 = Assert<Equal<AllPlaces["length"], 5528489>>;
-console.log(`\n## division_area の row group 3: ${mx.length} 件、country=${[...new Set(mx.map((d) => d.country))].join(",")}`);
-console.log("  ", mx.slice(0, 5).map((d) => `${d.names?.primary}（${d.subtype}）`).join(" / "));
-report("フッタ + row group 1 つ", t);
+type _6 = Assert<Equal<AllPlaces["length"], 5528489>>;
